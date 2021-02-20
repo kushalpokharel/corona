@@ -22,11 +22,15 @@ class _BlueState extends State<Blue> {
         _data += device.name+' (${device.address})\n';
       });
     });
-    _bluetooth.scanStopped.listen((device) {
-      setState(() {
-        _scanning = false;
-        _data += 'scan stopped\n';
-      });
+    _bluetooth.scanStopped.listen ((device) {
+      if(mounted) {
+        setState(() {
+          _scanning = false;
+          _data += 'scan stopped\n';
+          // _bluetooth.startScan(pairedDevices: false);
+          // _scanning = true;
+        });
+      }
     });
   }
 
@@ -48,17 +52,21 @@ class _BlueState extends State<Blue> {
                   try {
                     if(_scanning) {
                       await _bluetooth.stopScan();
-                      debugPrint("scanning stoped");
-                      setState(() {
-                        _data = '';
-                      });
+                      debugPrint("scanning stopped");
+                      if (mounted) {
+                        setState(() {
+                          _data = '';
+                        });
+                      }
                     }
                     else {
                       await _bluetooth.startScan(pairedDevices: false);
                       debugPrint("scanning started");
-                      setState(() {
-                        _scanning = true;
-                      });
+                      if (mounted) {
+                        setState(() {
+                          _scanning = true;
+                        });
+                      }
                     }
                   } on PlatformException catch (e) {
                     debugPrint(e.toString());

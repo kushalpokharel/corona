@@ -41,6 +41,15 @@ class BlueToothProvider with ChangeNotifier{
           _data += device.name+' (${device.address})\n';
           notifyListeners();
       });
+      _bluetooth.scanStopped.listen ((device) {
+
+            _scanning = false;
+            // _data += 'scan stopped\n';
+            _bluetooth.startScan(pairedDevices: false);
+            _scanning = true;
+            notifyListeners();
+          });
+        }
+      }
     }
-  }
-}
+

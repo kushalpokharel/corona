@@ -1,4 +1,4 @@
-package com.tendoll.covid
+package com.ku.coronaagain
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity
