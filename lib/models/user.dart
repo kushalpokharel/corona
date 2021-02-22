@@ -5,11 +5,13 @@ class UserModel {
   static const ID = "id";
   static const BLUETOOTH_ADDRESS = "bluetoothAddress";
   static const CLOSE_CONTACTS = "closeContacts";
+  static const STATUS = "status";
 
   String _number;
   String _id;
   String _bluetoothAddress;
   List _closeContacts;
+  int _status;
 
 //  getters
   String get number => _number;
@@ -20,6 +22,7 @@ class UserModel {
   UserModel.fromSnapshot(DocumentSnapshot snapshot) {
     _number = snapshot.data[NUMBER];
     _closeContacts = snapshot.data[CLOSE_CONTACTS];
+    _status = snapshot.data[STATUS];
     _id = snapshot.data[ID];
     _bluetoothAddress = snapshot.data[BLUETOOTH_ADDRESS];
 

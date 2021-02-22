@@ -1,8 +1,8 @@
 import 'dart:async';
-// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:covid/helpers/screen_navigation.dart';
 import 'package:covid/helpers/user.dart';
 import 'package:covid/models/user.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:covid/screens/enter_blue_address.dart';
 import 'package:covid/screens/home.dart';
 import 'package:flutter/material.dart';
@@ -27,15 +27,16 @@ class AuthProvider with ChangeNotifier{
   bool firstOpen;
   bool logedIn;
   bool loading = false;
-  bool bluetoothSet;
-
-
+  bool bluetoothSet=false;
+  Firestore _firestore = Firestore.instance;
+  String _bluetoothAddress = "";
 
 
 //  getter
   UserModel get userModel => _userModel;
   Status get status => _status;
   FirebaseUser get user => _user;
+  String get bluetoothAddress => _bluetoothAddress;
 
 
   TextEditingController address = TextEditingController();
@@ -47,6 +48,8 @@ class AuthProvider with ChangeNotifier{
 
   Future signOut()async{
     _auth.signOut();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool("login", false);
     _status = Status.Unauthenticated;
     notifyListeners();
     return Future.delayed(Duration.zero);
@@ -57,15 +60,18 @@ class AuthProvider with ChangeNotifier{
       SharedPreferences prefs = await SharedPreferences.getInstance();
       firstOpen = prefs.getBool('firstOpen') ?? true;
       logedIn = prefs.getBool('logedIn') ?? false;
-
-
+      // logedIn = false;
+      print('here');
+      await prefs.setBool("bluetoothSet", false);
       if(!logedIn){
         _status = Status.Unauthenticated;
       }else{
         _user = await _auth.currentUser();
         _userModel = await _userServicse.getUserById(_user.uid);
+
         if(_userModel != null){
-          if(_userModel.bluetoothAddress.isNotEmpty){
+          if(_userModel.bluetoothAddress != ""){
+
             await prefs.setBool("bluetoothSet", true);
           }
         }
@@ -73,8 +79,6 @@ class AuthProvider with ChangeNotifier{
       }
 
       bluetoothSet = prefs.getBool('bluetoothSet') ?? false;
-
-
       if(firstOpen){
         await prefs.setBool("firstOpen", false);
       }
@@ -180,8 +184,9 @@ class AuthProvider with ChangeNotifier{
       final FirebaseUser currentUser = await _auth.currentUser();
       assert(user.user.uid == currentUser.uid);
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setBool("logedIn", true);
+      // prefs.setBool("logedIn", true);
       logedIn =  true;
+
       if (user != null) {
         _userModel = await _userServicse.getUserById(user.user.uid);
         if(_userModel == null){
@@ -245,9 +250,12 @@ class AuthProvider with ChangeNotifier{
     if(_userModel == null){
       _createUser(id: _user.uid, number: _user.phoneNumber);
     }
-    updateUser({"id":id, "bluetoothAddress": bluetoothAddress});
+    updateUser({"id":id, "bluetoothAddress": bluetoothAddress, "status":0});
+    await _firestore.collection("infected").document(bluetoothAddress).setData({"closeContacts":[]});
+    await _firestore.collection("mapping").document(bluetoothAddress).setData({"uid":_user.uid});
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool("bluetoothSet", true);
+
   }
 
   void updateUser(Map<String, dynamic> values){

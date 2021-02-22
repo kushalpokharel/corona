@@ -13,11 +13,11 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
   runApp(MultiProvider(providers: [
-  ChangeNotifierProvider.value(value: AuthProvider.initialize()),
+    ChangeNotifierProvider.value(value: AuthProvider.initialize()),
     ChangeNotifierProvider.value(value: BlueToothProvider.initialize()),
 
   ],
-child: MyApp()));
+    child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {

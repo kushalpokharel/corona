@@ -4,7 +4,6 @@ import 'package:covid/providers/auth.dart';
 import 'package:covid/screens/home.dart';
 import 'package:covid/widgets/custom_button.dart';
 import 'package:covid/widgets/custom_text.dart';
-import 'package:covid/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
