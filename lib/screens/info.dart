@@ -1,17 +1,34 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:covid/helpers/style.dart';
+import 'package:covid/providers/auth.dart';
 import 'package:covid/widgets/custom_text.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 class Info extends StatefulWidget {
+  int status;
+  Info(this.status);
   @override
-  _InfoState createState() => _InfoState();
+  _InfoState createState() => _InfoState(status);
 }
 
+// Future<int> init() async{
+//   // TODO: implement initState
+//   final au = FirebaseAuth.instance;
+//   final ref =  au.currentUser();
+//   final docref =  await Firestore.instance.collection("users").document(ref.uid).get();
+//   int status = docref['status'];
+//   print(status);
+//   return status;
+// }
+
 class _InfoState extends State<Info> {
-  int status = 1;
+  int status;
+  _InfoState(this.status);
   // TODO: Status should be recieved from the database, 0 at default, changes when the user selects- Are you infected?
 
   List<String> statusDescription = [
@@ -52,7 +69,12 @@ class _InfoState extends State<Info> {
   ];
 
   @override
+
+
   Widget build(BuildContext context) {
+    final auth = Provider.of<AuthProvider>(context);
+
+
     return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
@@ -72,7 +94,7 @@ class _InfoState extends State<Info> {
                 Expanded(
                   child: const SizedBox(),
                 ),
-                _buildHeader(),
+                _buildHeader(status),
                 Expanded(
                   child: const SizedBox(),
                 ),
@@ -106,11 +128,20 @@ class _InfoState extends State<Info> {
                           ),
                           onPressed: () {
                             setState(() {
-                              if (status != 2)
+                              if (status != 2){
                                 status = 2;
-                              else
+                                auth.userServices.updateUserData({"id":auth.user.uid,"status":2});
+                                //aru user ko status 1 ma change garne
+                              }
+                              else {
                                 status = 0;
+                                auth.userServices.updateUserData({"id":auth.user.uid,"status":0});
+                              }
                             });
+                            if (status == 2){
+                              //aru user ko status 1 ma change garne
+
+                            }
                             Navigator.pop(context);
                           },
                           color: Colors.green,
@@ -128,10 +159,12 @@ class _InfoState extends State<Info> {
         ));
   }
 
-  Widget _buildHeader() {
-    // setState(() {
-    //   status = currentUser.status; //to perform state change
-    // });
+  Widget _buildHeader(status) {
+    final auth = Provider.of<AuthProvider>(context);
+    int st = auth.userModel.status;
+    setState(() {
+      status = st; //to perform state change
+    });
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -157,3 +190,11 @@ class _InfoState extends State<Info> {
     );
   }
 }
+
+// Future<bool> fetchData() async{
+//   final au = FirebaseAuth.instance;
+//   final ref =  au.currentUser();
+//   final docref =  Firestore.instance.collection("users").document(ref.uid).get();
+//   int status = docref['status'];
+//   print(status);
+// }

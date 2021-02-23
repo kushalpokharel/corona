@@ -12,6 +12,7 @@ class UserServices{
   }
 
   void updateUserData(Map<String, dynamic> values){
+    print(values['id']);
     _firestore.collection(collection).document(values['id']).updateData(values);
   }
 

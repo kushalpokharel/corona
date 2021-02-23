@@ -34,6 +34,7 @@ class AuthProvider with ChangeNotifier{
 
 //  getter
   UserModel get userModel => _userModel;
+  UserServices get userServices => _userServicse;
   Status get status => _status;
   FirebaseUser get user => _user;
   String get bluetoothAddress => _bluetoothAddress;
@@ -158,7 +159,7 @@ class AuthProvider with ChangeNotifier{
                       Navigator.of(context).pop();
                       loading = false;
                       notifyListeners();
-                      changeScreenReplacement(context, Home());
+                      changeScreenReplacement(context, Home(0));
                     } else {
                       loading = true;
                       notifyListeners();
@@ -200,7 +201,7 @@ class AuthProvider with ChangeNotifier{
         loading = false;
         Navigator.of(context).pop();
         if(bluetoothSet){
-          changeScreenReplacement(context, Home());
+          changeScreenReplacement(context, Home(0));
         }else{
           changeScreenReplacement(context, BluetoothAddress());
         }
@@ -208,7 +209,7 @@ class AuthProvider with ChangeNotifier{
       loading = false;
 
       Navigator.of(context).pop();
-      changeScreenReplacement(context, Home());
+      changeScreenReplacement(context, Home(0));
       notifyListeners();
 
     } catch (e) {

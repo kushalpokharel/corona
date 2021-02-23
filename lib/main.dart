@@ -49,7 +49,7 @@ class ScreensController extends StatelessWidget {
       print("The value is: ${auth.bluetoothSet}");
       print("The value is: ${auth.bluetoothSet}");
 
-      return whichWidgetToReturn(auth.bluetoothSet);
+      return whichWidgetToReturn(auth.bluetoothSet, auth.userModel.status);
       }else{
         // if(auth.firstOpen){
         //   return Login();
@@ -60,9 +60,9 @@ class ScreensController extends StatelessWidget {
     }
   }
 
-  Widget whichWidgetToReturn(bool setBluetoothAddress){
+  Widget whichWidgetToReturn(bool setBluetoothAddress, int st){
     if(setBluetoothAddress){
-      return Home();
+      return Home(st);
     }else{
       return BluetoothAddress();
     }

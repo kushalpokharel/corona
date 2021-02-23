@@ -12,11 +12,15 @@ import 'package:provider/provider.dart';
 //import 'enter_blue_address.dart';
 
 class Home extends StatefulWidget {
+  int status;
+  Home(this.status);
   @override
-  _HomeState createState() => _HomeState();
+  _HomeState createState() => _HomeState(status);
 }
 
 class _HomeState extends State<Home> {
+  int status;
+  _HomeState(this.status);
   @override
   Widget build(BuildContext context) {
     final blue = Provider.of<BlueToothProvider>(context);
@@ -36,7 +40,7 @@ class _HomeState extends State<Home> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Info()),
+                  MaterialPageRoute(builder: (context) => Info(status)),
                 );
                 print("settings");
               },

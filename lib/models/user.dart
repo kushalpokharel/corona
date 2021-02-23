@@ -18,6 +18,7 @@ class UserModel {
   String get id => _id;
   String get bluetoothAddress => _bluetoothAddress;
   List<String> get closeContacts => _closeContacts;
+  int get status => _status;
 
   UserModel.fromSnapshot(DocumentSnapshot snapshot) {
     _number = snapshot.data[NUMBER];
