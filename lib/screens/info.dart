@@ -30,7 +30,7 @@ class _InfoState extends State<Info> {
   int status;
   _InfoState(this.status);
   // TODO: Status should be recieved from the database, 0 at default, changes when the user selects- Are you infected?
-
+  final _firestore = Firestore.instance;
   List<String> statusDescription = [
     "Based on your ID, you have not \n been near someone who has tested positive.",
     "Based on your ID, you have \n been near someone who has tested positive.Consult health authorities.",
@@ -131,7 +131,7 @@ class _InfoState extends State<Info> {
                               if (status != 2){
                                 status = 2;
                                 auth.userServices.updateUserData({"id":auth.user.uid,"status":2});
-                                //aru user ko status 1 ma change garne
+
                               }
                               else {
                                 status = 0;
@@ -140,7 +140,27 @@ class _InfoState extends State<Info> {
                             });
                             if (status == 2){
                               //aru user ko status 1 ma change garne
-
+                              print(auth.userModel.bluetoothAddress);
+                              _firestore.collection("infected").document(auth.userModel.bluetoothAddress).get()
+                                  .then((docref){
+                                    print("hereeeee");
+                                    final list = docref.data["closeContacts"];
+                                    for(String id in list)
+                                    {
+                                      // print(id);
+                                      _firestore.collection("mapping").document(id).get()
+                                          .then((mapref){
+                                            if(mapref.exists) {
+                                              final uid = mapref.data["uid"];
+                                              print(uid);
+                                              _firestore.collection("users")
+                                                  .document(uid)
+                                                  .updateData(
+                                                  {"status": 1});
+                                            }
+                                      });
+                                    }
+                              });
                             }
                             Navigator.pop(context);
                           },
