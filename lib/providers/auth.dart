@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/scheduler.dart';
 
 
 enum Status{Uninitialized, Authenticated, Authenticating, Unauthenticated}
@@ -61,13 +62,15 @@ class AuthProvider with ChangeNotifier{
       SharedPreferences prefs = await SharedPreferences.getInstance();
       firstOpen = prefs.getBool('firstOpen') ?? true;
       logedIn = prefs.getBool('logedIn') ?? false;
-      // logedIn = false;
+       // logedIn = false;
       print('here');
+      _user = await _auth.currentUser();
       await prefs.setBool("bluetoothSet", false);
       if(!logedIn){
+
         _status = Status.Unauthenticated;
       }else{
-        _user = await _auth.currentUser();
+
         _userModel = await _userServicse.getUserById(_user.uid);
 
         if(_userModel != null){
@@ -88,7 +91,7 @@ class AuthProvider with ChangeNotifier{
   }
 
 // ! PHONE AUTH
-  Future<void> verifyPhone(BuildContext context, String number) async {
+  Future<void> verifyPhone(BuildContext context, String number,FirebaseUser user) async {
     final PhoneCodeSent smsOTPSent = (String verId, [int forceCodeResend]) {
       this.verificationId = verId;
       smsOTPDialog(context).then((value) {
@@ -100,18 +103,71 @@ class AuthProvider with ChangeNotifier{
           phoneNumber: number.trim(), // PHONE NUMBER TO SEND OTP
           codeAutoRetrievalTimeout: (String verId) {
             //Starts the phone number verification process for the given phone number.
-            //Either sends an SMS with a 6 digit code to the phone number specified, or sign's the user in and [verificationCompleted] is called.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           //Either sends an SMS with a 6 digit code to the phone number specified, or sign's the user in and [verificationCompleted] is called.
             this.verificationId = verId;
           },
           codeSent:
           smsOTPSent, // WHEN CODE SENT THEN WE OPEN DIALOG TO ENTER OTP.
           timeout: const Duration(seconds: 20),
-          verificationCompleted: (AuthCredential phoneAuthCredential) {
+          verificationCompleted: (AuthCredential phoneAuthCredential) async{
             print(phoneAuthCredential.toString() + "lets make this work");
+
+
+            //   final AuthResult user = await _auth.signInWithCredential(phoneAuthCredential);
+            //   final FirebaseUser currentUser = await _auth.currentUser();
+            //   assert(user.user.uid == currentUser.uid);
+            //   SharedPreferences prefs = await SharedPreferences.getInstance();
+            //   prefs.setBool("logedIn", true);
+            //   print("logedin");
+            //   // logedIn =  true;
+            //
+            //   if (user != null) {
+            //     _userModel = await _userServicse.getUserById(user.user.uid);
+            //     if(_userModel == null){
+            //       _createUser(id: user.user.uid, number: user.user.phoneNumber);
+            //     }else{
+            //       if(_userModel.bluetoothAddress != null){
+            //         print("notnull");
+            //         await prefs.setBool("bluetoothSet", true);
+            //       }
+            //     }
+            //
+            //     loading = false;
+            //     if(bluetoothSet){
+            //       SchedulerBinding.instance.addPostFrameCallback((_) {
+            //         changeScreenReplacement(context, Home(0));
+            //       });
+            //     }else{
+            //       SchedulerBinding.instance.addPostFrameCallback((_) {
+            //         changeScreenReplacement(context, BluetoothAddress());
+            //       });
+            //
+            //
+            //     }
+            //   }
+            //   loading = false;
+            //
+            //   Navigator.of(context).pop();
+            //   changeScreenReplacement(context, Home(0));
+            //   notifyListeners();
+            //
+            // } );
+          //   if(_userModel != null){
+          //     if(_userModel.bluetoothAddress != ""){
+          //
+          //       changeScreenReplacement(context, Home(0));
+          //     }
+          //     else{
+          //       print("bluefalse");
+          //       changeScreenReplacement(context, BluetoothAddress());
+          //     }
+          //   }
+          //
           },
           verificationFailed: (AuthException exceptio) {
             print('${exceptio.message} + something is wrong');
           });
+
     } catch (e) {
       handleError(e, context);
       errorMessage = e.toString();
@@ -120,9 +176,9 @@ class AuthProvider with ChangeNotifier{
     notifyListeners();
   }
 
-  Future<bool> smsOTPDialog(BuildContext context) {
+  Future<bool> smsOTPDialog(BuildContext bcontext) {
     return showDialog(
-        context: context,
+        context: bcontext,
         barrierDismissible: false,
         builder: (BuildContext context) {
           return  AlertDialog(
@@ -151,19 +207,21 @@ class AuthProvider with ChangeNotifier{
                   loading = true;
                   notifyListeners();
                   _auth.currentUser().then((user) async{
+                    print(user);
                     if (user != null) {
                       _userModel = await _userServicse.getUserById(user.uid);
                       if(_userModel == null){
                         _createUser(id: user.uid, number: user.phoneNumber);
                       }
-                      Navigator.of(context).pop();
+                      // Navigator.of(context).pop();
                       loading = false;
                       notifyListeners();
                       changeScreenReplacement(context, Home(0));
                     } else {
+                      print("ever here?");
                       loading = true;
                       notifyListeners();
-                      Navigator.of(context).pop();
+                      // Navigator.of(context).pop();
                       signIn(context);
                     }
                   });
@@ -185,25 +243,34 @@ class AuthProvider with ChangeNotifier{
       final FirebaseUser currentUser = await _auth.currentUser();
       assert(user.user.uid == currentUser.uid);
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      // prefs.setBool("logedIn", true);
-      logedIn =  true;
+      prefs.setBool("logedIn", true);
+      print("logedin");
+      // logedIn =  true;
 
       if (user != null) {
+        print("usernotnull");
         _userModel = await _userServicse.getUserById(user.user.uid);
         if(_userModel == null){
           _createUser(id: user.user.uid, number: user.user.phoneNumber);
         }else{
-          if(_userModel.bluetoothAddress != null){
+          if(_userModel.bluetoothAddress != ""){
+            print("notnull");
+            print(_userModel.bluetoothAddress);
             await prefs.setBool("bluetoothSet", true);
           }
         }
 
         loading = false;
-        Navigator.of(context).pop();
         if(bluetoothSet){
-          changeScreenReplacement(context, Home(0));
+          SchedulerBinding.instance.addPostFrameCallback((_) {
+            changeScreenReplacement(context, Home(0));
+          });
         }else{
-          changeScreenReplacement(context, BluetoothAddress());
+          SchedulerBinding.instance.addPostFrameCallback((_) {
+            changeScreenReplacement(context, BluetoothAddress());
+          });
+
+
         }
       }
       loading = false;
@@ -253,10 +320,10 @@ class AuthProvider with ChangeNotifier{
     }
     updateUser({"id":id, "bluetoothAddress": bluetoothAddress, "status":0});
     await _firestore.collection("infected").document(bluetoothAddress).setData({"closeContacts":[]});
-    await _firestore.collection("mapping").document(bluetoothAddress).setData({"uid":_user.uid});
+    await _firestore.collection("mapping").document(bluetoothAddress).setData({"uid":_userModel.id});
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool("bluetoothSet", true);
-
+    _userModel = await _userServicse.getUserById(user.uid);
   }
 
   void updateUser(Map<String, dynamic> values){

@@ -86,7 +86,7 @@ class _BluetoothAddressState extends State<BluetoothAddress> {
 
             SizedBox(height: 10),
             CustomButton(msg: "Send Address", onTap: (){
-              auth.setBluetoothAddress(id: auth.user.uid, bluetoothAddress: auth.address.text.trim());
+              auth.setBluetoothAddress(id: auth.userModel.id, bluetoothAddress: auth.address.text.trim());
               changeScreenReplacement(context, Home(0));
             })
           ]),

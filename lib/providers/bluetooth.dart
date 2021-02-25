@@ -51,8 +51,12 @@ class BlueToothProvider with ChangeNotifier {
 
     Future<String> getadd() async{
       final _user = await _auth.currentUser();
+      if(_user==null)
+        return "";
       final _userServicse = await UserServices();
       final _userModel = await _userServicse.getUserById(_user.uid);
+      if(_userModel==null)
+        return "";
       final add = _userModel.bluetoothAddress;
       return add;
     }

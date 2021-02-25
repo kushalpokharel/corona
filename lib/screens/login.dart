@@ -86,7 +86,7 @@ class _LoginState extends State<Login> {
             ),
             SizedBox(height: 10),
             CustomButton(msg: "Verify", onTap: (){
-              auth.verifyPhone(context, number.text);
+              auth.verifyPhone(context, number.text,auth.user);
             })
           ]),
         ),
