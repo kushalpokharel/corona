@@ -130,6 +130,7 @@ class AuthProvider with ChangeNotifier{
               _userModel = await _userServicse.getUserById(user.user.uid);
               if(_userModel == null){
                 _createUser(id: user.user.uid, number: user.user.phoneNumber);
+                _userModel = await _userServicse.getUserById(user.user.uid);
               }else{
                 if(_userModel.bluetoothAddress != ""){
                   print("notnull");

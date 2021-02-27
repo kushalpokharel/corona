@@ -27,7 +27,11 @@ class BlueToothProvider with ChangeNotifier {
 
   void turnOn()async{
     isOn = await flutterBlue.isOn;
+    if(isOn)
+      searchForDevices();
     notifyListeners();
+
+
   }
 
   void updateDb(BluetoothDevice device, address) async{
