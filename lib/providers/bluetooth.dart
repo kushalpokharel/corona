@@ -45,7 +45,7 @@ class BlueToothProvider with ChangeNotifier {
         .collection('infected');
 
 
-    ref.document(address).updateData({'closeContacts':FieldValue.arrayUnion([device.address])});
+    ref.document(address).updateData({'closeContacts':FieldValue.arrayUnion([{'contact':device.address,'timestamp':DateTime.now()}])});
 
   }
 

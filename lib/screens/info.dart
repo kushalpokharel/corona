@@ -145,10 +145,10 @@ class _InfoState extends State<Info> {
                                   .then((docref){
                                     print("hereeeee");
                                     final list = docref.data["closeContacts"];
-                                    for(String id in list)
+                                    for(Map<String,dynamic> item in list)
                                     {
                                       // print(id);
-                                      _firestore.collection("mapping").document(id).get()
+                                      _firestore.collection("mapping").document(item['contact']).get()
                                           .then((mapref){
                                             if(mapref.exists) {
                                               final uid = mapref.data["uid"];

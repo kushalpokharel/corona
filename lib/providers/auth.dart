@@ -10,6 +10,7 @@ import 'package:flutter/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 
 enum Status{Uninitialized, Authenticated, Authenticating, Unauthenticated}
@@ -31,7 +32,7 @@ class AuthProvider with ChangeNotifier{
   bool bluetoothSet=false;
   Firestore _firestore = Firestore.instance;
   String _bluetoothAddress = "";
-
+  FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 
 //  getter
   UserModel get userModel => _userModel;
@@ -45,6 +46,7 @@ class AuthProvider with ChangeNotifier{
 
 
   AuthProvider.initialize(){
+
     readPrefs();
   }
 
@@ -303,13 +305,28 @@ class AuthProvider with ChangeNotifier{
     if(_userModel == null){
       _createUser(id: _user.uid, number: _user.phoneNumber);
     }
-    updateUser({"id":id, "bluetoothAddress": bluetoothAddress, "status":0});
-    await _firestore.collection("infected").document(bluetoothAddress).setData({"closeContacts":[]});
-    await _firestore.collection("mapping").document(bluetoothAddress).setData({"uid":_userModel.id});
+    updateUser({"id":id, "bluetoothAddress": bluetoothAddress.toUpperCase(), "status":0});
+    await _firestore.collection("infected").document(bluetoothAddress.toUpperCase()).setData({"closeContacts":[]});
+    await _firestore.collection("mapping").document(bluetoothAddress.toUpperCase()).setData({"uid":_userModel.id});
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool("bluetoothSet", true);
     _userModel = await _userServicse.getUserById(_userModel.id);
+    _firebaseMessaging.getToken().then((token){
+    updateUser({"id":id,"token":token});
+    // checkforremoval(id,bluetoothAddress);
+    });
   }
+
+  // void checkforremoval (String id, String bluetoothid)async
+  // {
+  //   final docref = await _firestore.collection("infected").document(bluetoothid);
+  //   var now = DateTime.now();
+  //   final cutoff = now.subtract(new Duration(minutes: 1)) ;
+  //   Query olditems = await docref.child('').orderBy("timestamp");
+  // for (DataSnapshot itemSnapshot: snapshot.getChildren()) {
+  // itemSnapshot.getRef().removeValue();
+  // }
+  // }
 
   void updateUser(Map<String, dynamic> values){
     _userServicse.updateUserData(values);
