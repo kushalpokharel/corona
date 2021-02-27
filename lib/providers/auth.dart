@@ -112,57 +112,41 @@ class AuthProvider with ChangeNotifier{
           verificationCompleted: (AuthCredential phoneAuthCredential) async{
             print(phoneAuthCredential.toString() + "lets make this work");
 
+            final AuthResult user = await _auth.signInWithCredential(phoneAuthCredential);
+            print(user.toString());
+            final FirebaseUser currentUser = await _auth.currentUser();
+            print(currentUser.toString());
 
-            //   final AuthResult user = await _auth.signInWithCredential(phoneAuthCredential);
-            //   final FirebaseUser currentUser = await _auth.currentUser();
-            //   assert(user.user.uid == currentUser.uid);
-            //   SharedPreferences prefs = await SharedPreferences.getInstance();
-            //   prefs.setBool("logedIn", true);
-            //   print("logedin");
-            //   // logedIn =  true;
-            //
-            //   if (user != null) {
-            //     _userModel = await _userServicse.getUserById(user.user.uid);
-            //     if(_userModel == null){
-            //       _createUser(id: user.user.uid, number: user.user.phoneNumber);
-            //     }else{
-            //       if(_userModel.bluetoothAddress != null){
-            //         print("notnull");
-            //         await prefs.setBool("bluetoothSet", true);
-            //       }
-            //     }
-            //
-            //     loading = false;
-            //     if(bluetoothSet){
-            //       SchedulerBinding.instance.addPostFrameCallback((_) {
-            //         changeScreenReplacement(context, Home(0));
-            //       });
-            //     }else{
-            //       SchedulerBinding.instance.addPostFrameCallback((_) {
-            //         changeScreenReplacement(context, BluetoothAddress());
-            //       });
-            //
-            //
-            //     }
-            //   }
-            //   loading = false;
-            //
-            //   Navigator.of(context).pop();
-            //   changeScreenReplacement(context, Home(0));
-            //   notifyListeners();
-            //
-            // } );
-          //   if(_userModel != null){
-          //     if(_userModel.bluetoothAddress != ""){
-          //
-          //       changeScreenReplacement(context, Home(0));
-          //     }
-          //     else{
-          //       print("bluefalse");
-          //       changeScreenReplacement(context, BluetoothAddress());
-          //     }
-          //   }
-          //
+            assert(user.user.uid == currentUser.uid);
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            prefs.setBool("logedIn", true);
+            print("logedin");
+            // logedIn =  true;
+
+            if (user != null) {
+              print("usernotnull");
+              _userModel = await _userServicse.getUserById(user.user.uid);
+              if(_userModel == null){
+                _createUser(id: user.user.uid, number: user.user.phoneNumber);
+              }else{
+                if(_userModel.bluetoothAddress != ""){
+                  print("notnull");
+                  print(_userModel.bluetoothAddress);
+                  await prefs.setBool("bluetoothSet", true);
+                }
+              }
+
+              loading = false;
+              if(bluetoothSet){
+                SchedulerBinding.instance.addPostFrameCallback((_) {
+                  changeScreenReplacement(context, Home(0));
+                });
+              }else {
+                SchedulerBinding.instance.addPostFrameCallback((_) {
+                  changeScreenReplacement(context, BluetoothAddress());
+                });
+              }
+            }
           },
           verificationFailed: (AuthException exceptio) {
             print('${exceptio.message} + something is wrong');

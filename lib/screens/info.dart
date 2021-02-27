@@ -180,11 +180,7 @@ class _InfoState extends State<Info> {
   }
 
   Widget _buildHeader(status) {
-    final auth = Provider.of<AuthProvider>(context);
-    int st = auth.userModel.status;
-    setState(() {
-      status = st; //to perform state change
-    });
+    
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
