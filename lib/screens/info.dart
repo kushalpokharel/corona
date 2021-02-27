@@ -130,12 +130,12 @@ class _InfoState extends State<Info> {
                             setState(() {
                               if (status != 2){
                                 status = 2;
-                                auth.userServices.updateUserData({"id":auth.user.uid,"status":2});
+                                auth.userServices.updateUserData({"id":auth.userModel.id,"status":2});
 
                               }
                               else {
                                 status = 0;
-                                auth.userServices.updateUserData({"id":auth.user.uid,"status":0});
+                                auth.userServices.updateUserData({"id":auth.userModel.id,"status":0});
                               }
                             });
                             if (status == 2){

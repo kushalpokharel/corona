@@ -236,6 +236,7 @@ class AuthProvider with ChangeNotifier{
         _userModel = await _userServicse.getUserById(user.user.uid);
         if(_userModel == null){
           _createUser(id: user.user.uid, number: user.user.phoneNumber);
+          _userModel = await _userServicse.getUserById(user.user.uid);
         }else{
           if(_userModel.bluetoothAddress != ""){
             print("notnull");
@@ -307,7 +308,7 @@ class AuthProvider with ChangeNotifier{
     await _firestore.collection("mapping").document(bluetoothAddress).setData({"uid":_userModel.id});
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool("bluetoothSet", true);
-    _userModel = await _userServicse.getUserById(user.uid);
+    _userModel = await _userServicse.getUserById(_userModel.id);
   }
 
   void updateUser(Map<String, dynamic> values){
