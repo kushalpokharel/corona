@@ -49,12 +49,13 @@ class BlueToothProvider with ChangeNotifier {
     final ref = await _firestore
         .collection('infected');
 
-    
-    // var re = await ref.document(address).get();
-    // for(var item in re["closeContacts"]){
-    //   count++;
-    // }
-    count++;
+    var a = 0;
+    var re = await ref.document(address).get();
+    for(var item in re["closeContacts"]){
+      a++;
+
+    }
+    count = a;
     ref.document(address).updateData({'closeContacts':FieldValue.arrayUnion([device.address])});
 
   }
