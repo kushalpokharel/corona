@@ -2,6 +2,7 @@
 import 'package:covid/helpers/screen_navigation.dart';
 import 'package:covid/helpers/style.dart';
 import 'package:covid/providers/bluetooth.dart';
+import 'package:covid/screens/info_about_covid.dart';
 import 'package:covid/screens/myapp.dart';
 import 'package:covid/screens/info.dart';
 //import 'package:covid/screens/test.dart';
@@ -117,7 +118,7 @@ class _HomeState extends State<Home> {
         body: blue.isOn
             ?
         Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.only(top:2.0),
           child: Column(children: <Widget>[
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -128,9 +129,9 @@ class _HomeState extends State<Home> {
                 ),
               ],
             ),
-            SizedBox(height: 10),
+            SizedBox(height: 3),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.only(top:2.0),
               child: CustomText(
                 text: "People Near You!",
                 size: 24,
@@ -138,9 +139,9 @@ class _HomeState extends State<Home> {
                 color: primary,
               ),
             ),
-            SizedBox(height: 5),
+            SizedBox(height: 3),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.only(top:2.0),
               child: CustomText(
                 text: blue.data,
                 size: 18,
@@ -154,6 +155,32 @@ class _HomeState extends State<Home> {
                 onPressed: () {
                   changeScreen(context, Blue());
                 }),
+
+            Padding(
+              padding: const EdgeInsets.only(top:2.0),
+              child: Card(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    const ListTile(
+                      leading: Icon(Icons.info_rounded),
+                      title: Text('Wanna Know More About Covid?'),
+                      subtitle: Text('Symptoms and Prevention'),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        TextButton(onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(builder:(context) => InfoScreen()));
+                        },
+                            child: const Text('Show')),
+                        const SizedBox(height: 3,),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
 
             Expanded(child: const SizedBox()),_launchStatsPage(),
 
