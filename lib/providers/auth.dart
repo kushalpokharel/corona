@@ -323,9 +323,9 @@ class AuthProvider with ChangeNotifier{
   //   final docref = await _firestore.collection("infected").document(bluetoothid);
   //   var now = DateTime.now();
   //   final cutoff = now.subtract(new Duration(minutes: 1)) ;
-  //   Query olditems = await docref.child('').orderBy("timestamp");
-  // for (DataSnapshot itemSnapshot: snapshot.getChildren()) {
-  // itemSnapshot.getRef().removeValue();
+  //   // Query olditems = await docref.child('').orderBy("timestamp");
+  // // for ( itemSnapshot: snapshot.getChildren()) {
+  // // itemSnapshot.getRef().removeValue();
   // }
   // }
 

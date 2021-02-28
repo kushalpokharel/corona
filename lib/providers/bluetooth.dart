@@ -16,7 +16,7 @@ class BlueToothProvider with ChangeNotifier {
   bool _scanning = false;
   FlutterScanBluetooth _bluetooth = FlutterScanBluetooth();
   Firestore _firestore = Firestore.instance;
-
+  int count=0;
 
   String get data => _data;
 
@@ -30,6 +30,7 @@ class BlueToothProvider with ChangeNotifier {
     if(isOn)
       searchForDevices();
     notifyListeners();
+
 
 
   }
@@ -48,8 +49,13 @@ class BlueToothProvider with ChangeNotifier {
     final ref = await _firestore
         .collection('infected');
 
-
-    ref.document(address).updateData({'closeContacts':FieldValue.arrayUnion([{'contact':device.address,'timestamp':DateTime.now()}])});
+    
+    // var re = await ref.document(address).get();
+    // for(var item in re["closeContacts"]){
+    //   count++;
+    // }
+    count++;
+    ref.document(address).updateData({'closeContacts':FieldValue.arrayUnion([device.address])});
 
   }
 
@@ -77,15 +83,16 @@ class BlueToothProvider with ChangeNotifier {
       _bluetooth.devices.toList().then((v){
         print("number of devices: ${ v.length}");
       });
-      _bluetooth.devices.listen((device) async{
-          if(device != null){
-            _data = "";
-            String _bluetoothAdd = await getadd();
-            if(_bluetoothAdd!="")
-              updateDb(device,_bluetoothAdd);
+      _bluetooth.devices.listen((device) async {
+        if (device != null) {
+          _data = "";
+          String _bluetoothAdd = await getadd();
+          if (_bluetoothAdd != "") {
+            updateDb(device, _bluetoothAdd);
           }
-          _data += device.name+' (${device.address})\n';
+          _data += device.name + ' (${device.address})\n';
           notifyListeners();
+        }
       });
       _bluetooth.scanStopped.listen ((device) {
 

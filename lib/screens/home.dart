@@ -8,6 +8,10 @@ import 'package:covid/screens/info.dart';
 import 'package:covid/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 
 //import 'enter_blue_address.dart';
 
@@ -22,8 +26,70 @@ class _HomeState extends State<Home> {
   int status;
   _HomeState(this.status);
   @override
+
+  Widget _launchStatsPage() {
+    return InkWell(
+      onTap: () {
+        Alert(
+          context: context,
+          title: "Open URL",
+          desc: "The app is trying to launch https://covid19.mohp.gov.np/",
+          buttons: [
+            DialogButton(
+              child: Text(
+                "CANCEL",
+                style: TextStyle(color: Colors.white, fontSize: 15),
+              ),
+              onPressed: () => Navigator.pop(context),
+              color: Colors.red,
+            ),
+            DialogButton(
+              child: Text(
+                "ALLOW",
+                style: TextStyle(color: Colors.white, fontSize: 15),
+              ),
+              onPressed: () => _launchURL("https://covid19.mohp.gov.np/"),
+              color: Colors.green,
+            )
+          ],
+        ).show();
+      },
+      child: Ink(
+        height: 75,
+        color: Colors.grey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            ListTile(
+              title: Text(
+                "View Covid Statistics",
+                style: Theme.of(context).textTheme.headline4.copyWith(
+                  color: Colors.white,
+                  fontSize: 18.0,
+                ),
+              ),
+              trailing: Icon(
+                FontAwesomeIcons.database,
+                color: Colors.white,
+                size: 18,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 18.0),
+              child: Text(
+                'MOHP',
+                style: TextStyle(color: Colors.white),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget build(BuildContext context) {
     final blue = Provider.of<BlueToothProvider>(context);
+    var count = blue.count;
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -49,8 +115,10 @@ class _HomeState extends State<Home> {
         ),
         backgroundColor: white,
         body: blue.isOn
-            ? Column(
-          children: <Widget>[
+            ?
+        Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(children: <Widget>[
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
@@ -86,10 +154,54 @@ class _HomeState extends State<Home> {
                 onPressed: () {
                   changeScreen(context, Blue());
                 }),
-            SizedBox(
-              height: 10,
+
+            Expanded(child: const SizedBox()),_launchStatsPage(),
+
+            Expanded(
+              //expands in remaining space in vertical direction
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    //expands in row axis, i.e. horizontally
+                    child: Container(
+                      color: Colors.white54,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          ListTile(
+                            title: Text(
+                              count.toString(),
+                              // globals.user.getCountOfDevices().toString(),
+                              style: Theme.of(context).textTheme.headline4.copyWith(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18.0,
+                              ),
+                            ),
+                            trailing: Icon(
+                              FontAwesomeIcons.exclamationTriangle,
+                              color: Colors.black38,
+                              size: 18,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 16.0),
+                            child: Text(
+                              'No. of devices \nToday',
+                              style: TextStyle(color: Colors.black38),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+
+                ],
+              ),
             ),
-          ],
+
+          ]),
+
         )
             : Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -125,5 +237,13 @@ class _HomeState extends State<Home> {
         ),
       ),
     );
+  }
+}
+
+_launchURL(url) async {
+  if (await canLaunch(url)) {
+    await launch(url);
+  } else {
+    throw 'Could not launch $url';
   }
 }

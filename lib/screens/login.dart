@@ -68,7 +68,7 @@ class _LoginState extends State<Login> {
                     decoration: InputDecoration(
                         icon: Icon(Icons.phone_android, color: grey),
                         border: InputBorder.none,
-                        hintText: "+123 45678 786",
+                        hintText: "+977 9876543210",
                         hintStyle: TextStyle(
                             color: grey,
                             fontFamily: "Sen",
