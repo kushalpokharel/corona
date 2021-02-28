@@ -49,6 +49,9 @@ class BlueToothProvider with ChangeNotifier {
     final ref = await _firestore
         .collection('infected');
 
+
+
+    ref.document(address).updateData({'closeContacts':FieldValue.arrayUnion([device.address])});
     var a = 0;
     var re = await ref.document(address).get();
     for(var item in re["closeContacts"]){
@@ -56,8 +59,6 @@ class BlueToothProvider with ChangeNotifier {
 
     }
     count = a;
-    ref.document(address).updateData({'closeContacts':FieldValue.arrayUnion([device.address])});
-
   }
 
     Future<String> getadd() async{
