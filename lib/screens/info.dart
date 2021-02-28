@@ -73,110 +73,128 @@ class _InfoState extends State<Info> {
 
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthProvider>(context);
-
-
-    return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          iconTheme: IconThemeData(
-            color: Colors.black, //change your color here
-          ),
-          backgroundColor: white,
-          title: CustomText(text: "Corona Out"),
-          centerTitle: true,
-          elevation: 0.5,
-        ),
-        body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              children: <Widget>[
-                Expanded(
-                  child: const SizedBox(),
-                ),
-                _buildHeader(status),
-                Expanded(
-                  child: const SizedBox(),
-                ),
-                InkWell(
-                  child: Container(
-                    padding: EdgeInsets.all(12.0),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).buttonColor,
-                      borderRadius: BorderRadius.circular(8.0),
+  return FutureBuilder(
+    future: Firestore.instance.collection("users").document(auth.userModel.id).get(),
+    builder:(BuildContext context,  snapshot){
+      if(snapshot.hasData) {
+        status = snapshot.data['status'];
+        return Scaffold(
+            backgroundColor: Colors.white,
+            appBar: AppBar(
+              iconTheme: IconThemeData(
+                color: Colors.black, //change your color here
+              ),
+              backgroundColor: white,
+              title: CustomText(text: "Corona Out"),
+              centerTitle: true,
+              elevation: 0.5,
+            ),
+            body: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  children: <Widget>[
+                    Expanded(
+                      child: const SizedBox(),
                     ),
-                    child: Text(questionText[status]),
-                  ),
-                  onTap: () {
-                    Alert(
-                      context: context,
-                      title: "Are you sure?",
-                      desc: status < 2 ? questionText[1] : questionText[2],
-                      buttons: [
-                        DialogButton(
-                          child: Text(
-                            "NO",
-                            style: TextStyle(color: Colors.white, fontSize: 15),
-                          ),
-                          onPressed: () => Navigator.pop(context),
-                          color: Colors.red,
+                    _buildHeader(status),
+                    Expanded(
+                      child: const SizedBox(),
+                    ),
+                    InkWell(
+                      child: Container(
+                        padding: EdgeInsets.all(12.0),
+                        decoration: BoxDecoration(
+                          color: Theme
+                              .of(context)
+                              .buttonColor,
+                          borderRadius: BorderRadius.circular(8.0),
                         ),
-                        DialogButton(
-                          child: Text(
-                            "YES",
-                            style: TextStyle(color: Colors.white, fontSize: 15),
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              if (status != 2){
-                                status = 2;
-                                auth.userServices.updateUserData({"id":auth.userModel.id,"status":2});
-
-                              }
-                              else {
-                                status = 0;
-                                auth.userServices.updateUserData({"id":auth.userModel.id,"status":0});
-                              }
-                            });
-                            if (status == 2){
-                              //aru user ko status 1 ma change garne
-                              print(auth.userModel.bluetoothAddress);
-                              _firestore.collection("infected").document(auth.userModel.bluetoothAddress).get()
-                                  .then((docref){
+                        child: Text(questionText[status]),
+                      ),
+                      onTap: () {
+                        Alert(
+                          context: context,
+                          title: "Are you sure?",
+                          desc: status < 2 ? questionText[1] : questionText[2],
+                          buttons: [
+                            DialogButton(
+                              child: Text(
+                                "NO",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 15),
+                              ),
+                              onPressed: () => Navigator.pop(context),
+                              color: Colors.red,
+                            ),
+                            DialogButton(
+                              child: Text(
+                                "YES",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 15),
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  if (status != 2) {
+                                    status = 2;
+                                    auth.userServices.updateUserData(
+                                        {"id": auth.userModel.id, "status": 2});
+                                  }
+                                  else {
+                                    status = 0;
+                                    auth.userServices.updateUserData(
+                                        {"id": auth.userModel.id, "status": 0});
+                                  }
+                                });
+                                if (status == 2) {
+                                  //aru user ko status 1 ma change garne
+                                  print(auth.userModel.bluetoothAddress);
+                                  _firestore.collection("infected").document(
+                                      auth.userModel.bluetoothAddress).get()
+                                      .then((docref) {
                                     print("hereeeee");
                                     final list = docref.data["closeContacts"];
-                                    for(String item in list)
-                                    {
+                                    for (String item in list) {
                                       // print(id);
-                                      _firestore.collection("mapping").document(item).get()
-                                          .then((mapref){
-                                            if(mapref.exists) {
-                                              final uid = mapref.data["uid"];
-                                              print(uid);
-                                              _firestore.collection("users")
-                                                  .document(uid)
-                                                  .updateData(
-                                                  {"status": 1});
-                                            }
+                                      _firestore.collection("mapping").document(
+                                          item).get()
+                                          .then((mapref) {
+                                        if (mapref.exists) {
+                                          final uid = mapref.data["uid"];
+                                          print(uid);
+                                          _firestore.collection("users")
+                                              .document(uid)
+                                              .updateData(
+                                              {"status": 1});
+                                        }
                                       });
                                     }
-                              });
-                            }
-                            Navigator.pop(context);
-                          },
-                          color: Colors.green,
-                        )
-                      ],
-                    ).show();
-                  },
+                                  });
+                                }
+                                Navigator.pop(context);
+                              },
+                              color: Colors.green,
+                            )
+                          ],
+                        ).show();
+                      },
+                    ),
+                    Expanded(
+                      child: const SizedBox(),
+                    ),
+                  ],
                 ),
-                Expanded(
-                  child: const SizedBox(),
-                ),
-              ],
-            ),
-          ),
-        ));
+              ),
+            ));
+      }
+      return Text(
+        'Error'
+      );
+
+    }
+  );
+
+
   }
 
   Widget _buildHeader(status) {
